@@ -1,0 +1,92 @@
+from zargo.block.back_reference_block import BackReferenceBlock
+from zargo.block.length_block import LengthBlock
+from zargo.wiretype.block import ArgoBlockWireType
+from zargo.wiretype.scalar import ArgoScalarWireType
+from .utils.data_reader import DataReader
+
+class ArgoDataDecoder() :
+
+    def __init__(self,argoBlock,blockReader,argoHeader):
+        self.argoBlock = argoBlock
+        self.blockReader = blockReader
+        self.argoHeader = argoHeader
+            
+    def decodeString(self):
+        return self.argoBlock.getBlockData(
+            "String", 
+            ArgoBlockWireType(
+                ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING),
+                "String",
+                True
+            )
+        ).getData(
+            self.blockReader
+        )
+    
+    def decodeBoolean(self):
+        return self.argoBlock.getBlockData(
+            "Boolean", 
+            ArgoBlockWireType(
+                ArgoScalarWireType.getInstance(ArgoScalarWireType.BOOLEAN),
+                "Boolean",
+                False
+            )
+        ).getData(
+            self.blockReader
+        )       
+
+    def decodeBytes(self):
+        return self.argoBlock.getBlockData(
+            "Bytes",
+            ArgoBlockWireType(
+                ArgoScalarWireType.getInstance(ArgoBlockWireType.BYTES),
+                "Bytes",
+                False
+            )
+        ).getData(
+            self.blockReader
+        )
+
+    def decodeBlock(self,wt):
+
+        wireType = wt.wireType
+        if isinstance(wireType,ArgoScalarWireType):
+            if wireType.type==ArgoScalarWireType.STRING:
+                return self.argoBlock.getBlockData(
+                    wt.key ,
+                    ArgoBlockWireType(
+                        ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING),
+                        "String",
+                        True
+                    )
+                ).getData(
+                    self.blockReader
+                )         
+
+            if wireType.type==ArgoScalarWireType.BOOLEAN:
+                return self.argoBlock.getBlockData(
+                    "Boolean", 
+                    ArgoBlockWireType(
+                        ArgoScalarWireType.getInstance(ArgoScalarWireType.BOOLEAN),
+                        "Boolean",
+                        False
+                    )
+                ).getData(
+                        self.blockReader
+                )  
+
+            if wireType.type==ArgoScalarWireType.BYTES:
+                return self.argoBlock.getBlockData(
+                    wt.key,
+                    ArgoBlockWireType(
+                        ArgoScalarWireType.getInstance(ArgoScalarWireType.BYTES),
+                        "Bytes",
+                        False,
+                    )
+                ).getData(
+                    self.blockReader
+                )
+
+
+
+
