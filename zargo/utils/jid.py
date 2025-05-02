@@ -54,17 +54,33 @@ class Jid:
     def readJid(bytes):
         ba = bytearray(bytes)
         ch = ba.pop(0)
-        if ch!=250: 
-            return None
-        t = ba.pop(0)
-        if t in [251,255] :
-            user =  "".join(map(chr,Jid.readPacked8(t,ba)))
-        else:
-            return None
-        t = ba.pop(0)
-        if t==3:
-            ret = user+"@s.whatsapp.net"
-        else:
-            return None
-        
-        return ret
+        if ch==250: 
+
+            t = ba.pop(0)
+            if t in [251,255] :
+                user =  "".join(map(chr,Jid.readPacked8(t,ba)))
+            else:
+                return None
+            t = ba.pop(0)
+            if t==3:
+                ret = user+"@s.whatsapp.net"
+            else:
+                return None
+            
+            return ret
+        elif ch==247:
+            xx = ba.pop(0)
+            device_no = ba.pop(0)
+            t = ba.pop(0)
+            if t in [251,255] :
+                user =  "".join(map(chr,Jid.readPacked8(t,ba)))
+            else:
+                return None 
+            if xx==1:
+                ret = "{}@lid".format(user)
+            else:
+                #其余情况，暂时按照普通id处置
+                ret = "{}.{}:{}@s.whatsapp.net".format(user,xx,device_no)
+
+            return ret
+               

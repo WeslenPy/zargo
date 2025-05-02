@@ -133,7 +133,11 @@ class ArgoMessageDecoder(metaclass=NoInstance):
                 return dataDecoder.decodeString()
 
         if isinstance(wireType, ArgoBlockWireType):
-            return dataDecoder.decodeBlock(wireType)
+            length = dataDecoder.blockReader.tryReadLength()
+            if length==-2:
+                return None
+            else:
+                return dataDecoder.decodeBlock(wireType)
         
         if isinstance(wireType, ArgoArrayWireType):
             arr = []
