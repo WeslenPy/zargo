@@ -12,15 +12,8 @@ class NoInstance(type):
 
 class ArgoMessageDecoder(metaclass=NoInstance):
 
-    _schemaStore = {}
-
-    @staticmethod
-    def addWireType(key,wiretype):
-        ArgoMessageDecoder._schemaStore.put(key,wiretype)
-
-    @staticmethod
-    def getWireType(key):            
-        return ArgoMessageDecoder._schemaStore.get(key)
+    _schemaStore = None
+    _schemaFile = None
     
     @staticmethod
     def getArgoDataDecoder(data):
@@ -71,12 +64,21 @@ class ArgoMessageDecoder(metaclass=NoInstance):
             if not argoBlock.inlineEverything:
                 return ArgoDataDecoder(argoBlock,BlockReader(argoBlock.byteQueue.pop()),header)
         return None
+    
+    @staticmethod
+    def setSchemaFile(filepath):
+        if ArgoMessageDecoder._schemaFile is None or ArgoMessageDecoder._schemaFile!=filepath:
+            ArgoMessageDecoder._schemaFile = filepath
+            ArgoMessageDecoder._schemaStore = None      #重新设置名称，那下次调用的时候就重新load
 
     #从argofile中读取信息
     @staticmethod
-    def loadSchemaDataFromFile(filename):
+    def loadSchemaFile():
+
+        if ArgoMessageDecoder._schemaFile is  None:
+            raise DataException(-1,"SCHEMA FILE NOT SET")
                 
-        with open(filename, 'rb') as f:
+        with open(ArgoMessageDecoder._schemaFile, 'rb') as f:
             data = f.read()
 
         dataDecoder = ArgoMessageDecoder.getArgoDataDecoder(data)
@@ -85,6 +87,9 @@ class ArgoMessageDecoder(metaclass=NoInstance):
         typeId = blockReader.readLength()
 
         if typeId==2:
+            if ArgoMessageDecoder._schemaStore is None:
+                ArgoMessageDecoder._schemaStore={}
+
             length = blockReader.readLength()
             for i in range(0,length):
                 key = dataDecoder.decodeString()
@@ -93,9 +98,9 @@ class ArgoMessageDecoder(metaclass=NoInstance):
 
     @staticmethod
     def decodeMessage(schemaEntry, msgBytes):
-
-        if len(ArgoMessageDecoder._schemaStore)==0:
-            raise DataException(-1,"SCHEMA NOT INIT")
+        
+        if ArgoMessageDecoder._schemaStore is None:
+            ArgoMessageDecoder.loadSchemaFile()
 
         if schemaEntry not in ArgoMessageDecoder._schemaStore:
             raise DataException(-1,"SCHEMA NAME ERROR")
