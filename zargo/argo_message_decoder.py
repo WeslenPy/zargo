@@ -5,7 +5,6 @@ from .argo_data_decoder import ArgoDataDecoder
 from .argo_wire_type_decoder import ArgoWireTypeDecoder
 from zargo.exception.data_exception import DataException
 from zargo.wiretype import *
-import traceback
 
 class NoInstance(type):
     def __call__(self,*args,**kwargs):
@@ -53,7 +52,6 @@ class ArgoMessageDecoder(metaclass=NoInstance):
                             userFlags.append(Bitwise.isBitSet(byte,pos))
                 
             header = ArgoHeader(inlineEverything,selfDescribing,outOfBandFieldErrors,selfDescribingErrors,nullTerminatedStrings,noDeduplication,hasUserFlags,userFlags)    
-
             argoBlock = ArgoBlock(header)
 
             if header.inlineEverything:
@@ -82,16 +80,12 @@ class ArgoMessageDecoder(metaclass=NoInstance):
             data = f.read()
 
         dataDecoder = ArgoMessageDecoder.getArgoDataDecoder(data)
-
         wireTypeDecoder = ArgoWireTypeDecoder(dataDecoder)
-
         blockReader = dataDecoder.blockReader
-
         typeId = blockReader.readLength()
 
         if typeId==2:
             length = blockReader.readLength()
-            
             for i in range(0,length):
                 key = dataDecoder.decodeString()
                 value = wireTypeDecoder.decodeWireType()
@@ -116,63 +110,52 @@ class ArgoMessageDecoder(metaclass=NoInstance):
     def decodeTypeData(wireType,dataDecoder):
 
         obj = {}
-        try:
 
-            if isinstance(wireType,ArgoFieldWireType):
-                return ArgoMessageDecoder.decodeTypeData(wireType.type,dataDecoder)
-            
-            if isinstance(wireType,ArgoRecordWireType):
-                for key,value in wireType.fields.items():
-                    value = ArgoMessageDecoder.decodeTypeData(value,dataDecoder)
-                    if value is not None:
-                        obj[key] = value
-    
-                return obj
-            
-            if isinstance(wireType, ArgoScalarWireType):
-                if wireType.type==ArgoScalarWireType.BOOLEAN:
-                    return dataDecoder.decodeBoolean()
-                
-                if wireType.type==ArgoScalarWireType.STRING:
-                    return dataDecoder.decodeString()
+        if isinstance(wireType,ArgoFieldWireType):
+            return ArgoMessageDecoder.decodeTypeData(wireType.type,dataDecoder)
+        
+        if isinstance(wireType,ArgoRecordWireType):
+            for key,value in wireType.fields.items():
+                value = ArgoMessageDecoder.decodeTypeData(value,dataDecoder)
+                if value is not None:
+                    obj[key] = value
+            return obj
+        
+        if isinstance(wireType, ArgoScalarWireType):
+            if wireType.type==ArgoScalarWireType.BOOLEAN:
+                return dataDecoder.decodeBoolean()
+            if wireType.type==ArgoScalarWireType.STRING:
+                return dataDecoder.decodeString()
 
-            if isinstance(wireType, ArgoBlockWireType):
-                return dataDecoder.decodeBlock(wireType)
-            
-            if isinstance(wireType, ArgoArrayWireType):
-                arr = []
-                length = dataDecoder.blockReader.tryReadLength()
-                
-                if length==-2:
-                    return arr
-                else:
-                    length = dataDecoder.blockReader.readLength()
-
-                for i in range(0,length):
-                    arr.append(ArgoMessageDecoder.decodeTypeData(wireType.type, dataDecoder))
-
+        if isinstance(wireType, ArgoBlockWireType):
+            return dataDecoder.decodeBlock(wireType)
+        
+        if isinstance(wireType, ArgoArrayWireType):
+            arr = []
+            length = dataDecoder.blockReader.tryReadLength()
+            if length==-2:
                 return arr
+            else:
+                length = dataDecoder.blockReader.readLength()
+
+            for i in range(0,length):
+                arr.append(ArgoMessageDecoder.decodeTypeData(wireType.type, dataDecoder))
+            return arr
+        
+        if isinstance(wireType, ArgoNullableWireType):
+            typeId = dataDecoder.blockReader.tryReadLength()
+            if typeId in [-1,-2,-3,0]:
+                dataDecoder.blockReader.readLength()
+            if typeId==-1:
+                return None #NullBlock
+            elif typeId==-3:
+                return "ERROR"
+            elif typeId==-2:
+                return None
+            else :
+                return ArgoMessageDecoder.decodeTypeData(wireType.inner,dataDecoder)
             
-            if isinstance(wireType, ArgoNullableWireType):
-                typeId = dataDecoder.blockReader.tryReadLength()
-                
-                if typeId in [-1,-2,-3,0]:
-                    dataDecoder.blockReader.readLength()
-                
-                if typeId==-1:
-                    return None #NullBlock
-                elif typeId==-3:
-                    return "ERROR"
-                elif typeId==-2:
-                    return None
-                else :
-                    return ArgoMessageDecoder.decodeTypeData(wireType.inner,dataDecoder)
-                
-            return None
-        except:
-            print(traceback.format_exc())
-            return None
-            
+        return None           
 
 
 
