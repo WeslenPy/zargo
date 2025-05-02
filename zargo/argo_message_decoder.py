@@ -124,7 +124,7 @@ class ArgoMessageDecoder(metaclass=NoInstance):
             if isinstance(wireType,ArgoRecordWireType):
                 for key,value in wireType.fields.items():
                     value = ArgoMessageDecoder.decodeTypeData(value,dataDecoder)
-                    if value:
+                    if value is not None:
                         obj[key] = value
     
                 return obj
