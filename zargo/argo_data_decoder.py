@@ -50,16 +50,21 @@ class ArgoDataDecoder() :
         wireType = wt.wireType
         if isinstance(wireType,ArgoScalarWireType):
             if wireType.type==ArgoScalarWireType.STRING:
-                return self.argoBlock.getBlockData(
+                blockData = self.argoBlock.getBlockData(
                     wt.key ,
                     ArgoBlockWireType(
                         ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING),
                         "String",
                         True
                     )
-                ).getData(
-                    self.blockReader
-                )         
+                )
+
+                if blockData is None:
+                    return None
+                else:
+                    return blockData.getData(
+                        self.blockReader
+                    )         
 
             if wireType.type==ArgoScalarWireType.BOOLEAN:
                 return self.argoBlock.getBlockData(
