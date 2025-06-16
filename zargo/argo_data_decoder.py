@@ -21,6 +21,18 @@ class ArgoDataDecoder() :
             self.blockReader
         )
     
+    def decodeInt(self):
+        return self.argoBlock.getBlockData(
+            "Int", 
+            ArgoBlockWireType(
+                ArgoScalarWireType.getInstance(ArgoScalarWireType.VARINT),
+                "Int",
+                False
+            )
+        ).getData(
+            self.blockReader
+        )        
+       
     def decodeBoolean(self):
         return self.argoBlock.getBlockData(
             "Boolean", 
@@ -37,15 +49,17 @@ class ArgoDataDecoder() :
         return self.argoBlock.getBlockData(
             "Bytes",
             ArgoBlockWireType(
-                ArgoScalarWireType.getInstance(ArgoBlockWireType.BYTES),
+                ArgoScalarWireType.getInstance(ArgoScalarWireType.BYTES),
                 "Bytes",
                 False
             )
         ).getData(
             self.blockReader
         )
+      
 
     def decodeBlock(self,wt):
+        
 
         wireType = wt.wireType
         if isinstance(wireType,ArgoScalarWireType):
@@ -89,6 +103,18 @@ class ArgoDataDecoder() :
                 ).getData(
                     self.blockReader
                 )
+            
+            if wireType.type==ArgoScalarWireType.VARINT:                
+                return self.argoBlock.getBlockData(
+                    wt.key,
+                    ArgoBlockWireType(
+                        ArgoScalarWireType.getInstance(ArgoScalarWireType.VARINT),
+                        "Int",
+                        False,
+                    )
+                ).getData(
+                    self.blockReader
+                )            
 
 
 

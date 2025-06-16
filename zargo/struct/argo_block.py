@@ -23,8 +23,8 @@ class ArgoBlock(object):
                 self.typeBlockMap[key] = newBlockData
                 return newBlockData
             else:
-                newBlockData = ArgoBlockData(wireType,self.header,None)
-                self.typeBlockMap[key] = newBlockData
+                newBlockData = ArgoBlockData(wireType,self.header,None)                
+                self.typeBlockMap[key] = newBlockData                
                 return newBlockData
             
         return blockData
