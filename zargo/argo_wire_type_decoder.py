@@ -52,16 +52,6 @@ class ArgoWireTypeDecoder() :
             wireType = self.decode()
             fields[wireType.name]=wireType
         return ArgoRecordWireType(fields)
-    
-    def decodeErrorWireType(self):
-
-        return ErrorWireType(
-            message =   ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING),
-            locations =  ArgoArrayWireType(ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING)),
-            path = ArgoArrayWireType(ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING)),
-            extensions = ExtensionWireType(DefaultWireType()),
-        )   
-
 
     def decode(self):
         name = self.messageDecoder.decodeString()
@@ -75,10 +65,10 @@ class ArgoWireTypeDecoder() :
             )
         ).getData(self.messageDecoder.blockReader)
         return ArgoFieldWireType(wireType,name,omittable)
-        
 
     def decodeWireType(self):
         typeId = self.messageDecoder.blockReader.readLength()
+        
 
         if  typeId==-1:
             return ArgoScalarWireType.getInstance(ArgoScalarWireType.STRING)
@@ -103,7 +93,7 @@ class ArgoWireTypeDecoder() :
         elif typeId==-11:
             return ArgoScalarWireType.getInstance(ArgoScalarWireType.DESC) 
         elif typeId==-12:
-            return self.decodeErrorWireType()
+            return ErrorWireType(DefaultWireType())
         elif typeId==-13:
             return PatchWireType(DefaultWireType())
         elif typeId==-15:

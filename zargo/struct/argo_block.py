@@ -15,16 +15,19 @@ class ArgoBlock(object):
         if blockData is None:
             header = self.header
 
+            
+
             if (not header.inlineEverything and not (isinstance(wireType.wireType,ArgoScalarWireType) and wireType.wireType.type==ArgoScalarWireType.BOOLEAN)):
 
+                
                 if len(self.byteQueue) == 0:
                     return None
                 newBlockData = ArgoBlockData(wireType,self.header,self.byteQueue.pop(0))
                 self.typeBlockMap[key] = newBlockData
                 return newBlockData
             else:
-                newBlockData = ArgoBlockData(wireType,self.header,None)                
-                self.typeBlockMap[key] = newBlockData                
+                newBlockData = ArgoBlockData(wireType,self.header,None)
+                self.typeBlockMap[key] = newBlockData
                 return newBlockData
             
         return blockData

@@ -83,4 +83,3 @@ class Jid:
                 ret = "{}.{}:{}@s.whatsapp.net".format(user,xx,device_no)
 
             return ret
-               

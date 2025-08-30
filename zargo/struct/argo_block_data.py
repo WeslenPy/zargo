@@ -23,6 +23,13 @@ class ArgoBlockData(object):
         if data is None:
             self.block = InlineBlock(header)            
 
+    def getVarInt(self,reader):
+        
+        if self.wireType.wireType.type==ArgoScalarWireType.VARINT:
+            if isinstance(self.block, NormalBlock):
+                length = self.block.reader.readVarLength()
+                return length
+
     def getBoolean(self,reader):
         if self.wireType.wireType.type==ArgoScalarWireType.BOOLEAN:
             value = reader.readLength()
@@ -30,20 +37,7 @@ class ArgoBlockData(object):
                 return True
             elif value==0:
                 return False
-            
             raise DataException(-2,"BOOLEAN VALUE ERROR")
-        
-    def getVarint(self,reader):
-        if self.wireType.wireType.type==ArgoScalarWireType.VARINT:
-            if isinstance(self.block, InlineBlock):
-                return reader.readLength()
-            elif isinstance(self.block, NormalBlock):                
-                length = reader.readLength()
-                x = self.block.reader.readVarLength()
-                return self.block.reader.readVarLength()                
-
-                            
-        raise DataException(-2,"VARINT VALUE ERROR")
         
     def getBytes(self, reader):
         if self.wireType.wireType.type==ArgoScalarWireType.BYTES:
@@ -118,6 +112,7 @@ class ArgoBlockData(object):
         raise DataException(-5,"WIRETYPE ERROR")
 
     def getData(self,reader):
+
         if self.wireType.wireType.type==ArgoScalarWireType.STRING:
             return self.getString(reader)
 
@@ -131,7 +126,7 @@ class ArgoBlockData(object):
             return self.getFloat64(reader)
         
         if self.wireType.wireType.type==ArgoScalarWireType.VARINT:
-            return self.getVarint(reader)        
+            return self.getVarInt(reader)
         
         return None
 
