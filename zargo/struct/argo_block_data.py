@@ -30,14 +30,19 @@ class ArgoBlockData(object):
                 length = self.block.reader.readVarLength()
                 return length
 
-    def getBoolean(self,reader):
+    def getBoolean(self,reader):        
         if self.wireType.wireType.type==ArgoScalarWireType.BOOLEAN:
-            value = reader.readLength()
+            #value = reader.readLength()
+            value = reader.tryReadLength()            
             if value==1:
+                reader.readLength()
                 return True
             elif value==0:
+                reader.readLength()
                 return False
-            raise DataException(-2,"BOOLEAN VALUE ERROR")
+            
+            return False
+            #raise DataException(-2,"BOOLEAN VALUE ERROR")
         
     def getBytes(self, reader):
         if self.wireType.wireType.type==ArgoScalarWireType.BYTES:
@@ -87,7 +92,8 @@ class ArgoBlockData(object):
                             else:
                                 raise DataException(-3,"INVALID DATA")
                         else:
-                            raise DataException(-4,"INDEX ERROR")
+                            return ""
+                            #raise DataException(-4,"INDEX ERROR")
 
                     elif isinstance(block, LengthBlock):
                         length = block.length                        

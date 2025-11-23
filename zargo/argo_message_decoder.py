@@ -118,6 +118,8 @@ class ArgoMessageDecoder(metaclass=NoInstance):
     @staticmethod
     def decodeTypeData(wireType,dataDecoder):
 
+        #python .\script\main.py 639750291982 misc.bizintegrity 8619874406144,8613431020620 --env smb_android
+
         obj = {}
 
         
@@ -126,19 +128,22 @@ class ArgoMessageDecoder(metaclass=NoInstance):
             return ArgoMessageDecoder.decodeTypeData(wireType.type,dataDecoder)
         
         if isinstance(wireType,ArgoRecordWireType):
-            for key,value in wireType.fields.items():             
-                #if key=="integrity_tags":
-                #    continue
-                value = ArgoMessageDecoder.decodeTypeData(value,dataDecoder)
+            for key,value in wireType.fields.items():                             
+                value = ArgoMessageDecoder.decodeTypeData(value,dataDecoder)                
                 if value is not None:
                     obj[key] = value
-                
+
+                                
             return obj
         
         if isinstance(wireType, ArgoScalarWireType):
             length = dataDecoder.blockReader.tryReadLength()
+
+            if length==None:
+                return None
             
-            if length==-2:
+            if length==-2:                
+                dataDecoder.blockReader.readLength()
                 return None
             if wireType.type==ArgoScalarWireType.BOOLEAN:
                 return dataDecoder.decodeBoolean()
@@ -149,6 +154,8 @@ class ArgoMessageDecoder(metaclass=NoInstance):
 
         if isinstance(wireType, ArgoBlockWireType):
             length = dataDecoder.blockReader.tryReadLength()
+            if length==None:
+                return None            
             if length==-2:
                 return None
             else:
@@ -157,9 +164,10 @@ class ArgoMessageDecoder(metaclass=NoInstance):
         if isinstance(wireType, ArgoArrayWireType):
             arr = []
             length = dataDecoder.blockReader.tryReadLength()
-
+            if length==None:
+                return None
             if length==-2:
-                length = dataDecoder.blockReader.readLength()
+                #length = dataDecoder.blockReader.readLength()
                 return arr
             else:
                 length = dataDecoder.blockReader.readLength()
@@ -183,7 +191,7 @@ class ArgoMessageDecoder(metaclass=NoInstance):
                 return "ERROR"
             elif typeId==-2:
                 return None
-            else :
+            else:
                 return ArgoMessageDecoder.decodeTypeData(wireType.inner,dataDecoder)
             
         return None           

@@ -9,7 +9,7 @@ class BlockReader() :
             
         
     def tryReadLength(self):
-        old = self.dataReader.getCurrentIndex()
+        old = self.dataReader.getCurrentIndex()        
         length = self.dataReader.readVarLength()
         self.dataReader.setCurrentIndex(old)
         return length

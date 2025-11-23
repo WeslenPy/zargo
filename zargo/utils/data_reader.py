@@ -49,7 +49,7 @@ class DataReader() :
                     # If the most significant bit is not set, decoding is complete
                     if (tempValue & 0x80) == 0:
                         # Decode ZigZag encoding
-                        decodedValue = (value >> 1) ^ -(value & 1)
+                        decodedValue = (value >> 1) ^ -(value & 1)                        
                         return decodedValue
                 else:
                     #/OVERFLOW IN VARLENGTH DECODING
