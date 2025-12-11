@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zargo"
+version = "0.1.0"
+description = "Utilities for decoding Argo wire-type messages."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pycryptodome>=3.19",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
