@@ -83,41 +83,43 @@ class RCDecrypt:
     
 if __name__ == "__main__":
 
-    a = RCDecrypt("919986514543","")
+    # a = RCDecrypt("919986514543","")
 
-    f = open("D:\\rc2","rb")
+    # f = open("D:\\rc2","rb")
 
-    data = f.read()
-
-
-    b = a.decrypt(data)
-
-    print(b)
+    # data = f.read()
 
 
-    '''
+    # b = a.decrypt(data)
 
-    ArgoMessageDecoder.setSchemaFile("d:\\argo-wire-type-store.argo")
-
-    #receivedBytes = b'\x04bNot Allowederror_codeis_retryableseverityCRITICAL\x06\x00\xaa\x06"\x00\x01\x02\x16\x03\x02\x00\x04\x06\x14\x0c\x18\x00\x10\x08\x10\x03'
-
-    receivedBytes = b'\x04dXWA2BusinessUserXWA2ResponseStatusXWA2Reachability\x14\xfa\xff\x86\x16&ad6?\x03\nEMPTY4\x00\x02 \x01\x14\x00$\x03\x03\x03\x03\n\x00 \x00\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03'
+    # print(b)
 
 
-<<<<<<< HEAD
-    receivedBytes = b'\x04fXWA2BusinessUserXWA2IntegritySignals1699622343000PH\x14\xfa\xff\x06c\x96"v\x98\t\x03\x10UNTIERED,\x00\x02 \x01\x14\x00(\x01\x00\x00\x01\x01\x1a\x04\x10\x00\x00\x01\x02\x03\x03\x03'
+    # '''
+    
+    async def main(): 
 
-    print(base64.b64encode(receivedBytes))
-    obj = ArgoMessageDecoder.decodeMessage("BizIntegrityQuery",receivedBytes)
-=======
+        await ArgoMessageDecoder.setSchemaFile("./argo-wire-type-store.argo")
 
-    print(base64.b64encode(receivedBytes))
-    obj = ArgoMessageDecoder.decodeMessage("ContactsBackupQuery",receivedBytes)
->>>>>>> c539eab0f2282d34f37788f0f29ef8866f2fdb58
+        #receivedBytes = b'\x04bNot Allowederror_codeis_retryableseverityCRITICAL\x06\x00\xaa\x06"\x00\x01\x02\x16\x03\x02\x00\x04\x06\x14\x0c\x18\x00\x10\x08\x10\x03'
 
-    x = json.dumps(obj,cls=BytesEncoder)
-    print(x)
-    '''
+        receivedBytes = b'\x04dXWA2BusinessUserXWA2ResponseStatusXWA2Reachability\x14\xfa\xff\x86\x16&ad6?\x03\nEMPTY4\x00\x02 \x01\x14\x00$\x03\x03\x03\x03\n\x00 \x00\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03'
+
+
+        receivedBytes = b'\x04fXWA2BusinessUserXWA2IntegritySignals1699622343000PH\x14\xfa\xff\x06c\x96"v\x98\t\x03\x10UNTIERED,\x00\x02 \x01\x14\x00(\x01\x00\x00\x01\x01\x1a\x04\x10\x00\x00\x01\x02\x03\x03\x03'
+
+        print(base64.b64encode(receivedBytes))
+        obj = await ArgoMessageDecoder.decodeMessage("BizIntegrityQuery",receivedBytes)
+
+        x = json.dumps(obj,cls=BytesEncoder)
+        print(x)
+        # '''
+        
+        
+        
+    import asyncio 
+    
+    asyncio.run(main())
     
 
 
